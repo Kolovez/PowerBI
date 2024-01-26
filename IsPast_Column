@@ -1,5 +1,10 @@
+// This code will return sales up until the last date that you specify
 IsPast = 
 VAR LastSaleDate = MAX ( Sales[Order Date] )
 VAR LastSaleDatePY = EDATE ( LastSaleDate, -12 ) 
 RETURN
 'Date'[Date] <= LastSaleDatePY
+
+// Use together with this measure:
+Adjusted Previous Year = 
+CALCULATE( [Sales Amount], SAMEPERIODLASTYEAR( 'Date'[Date] ), 'Date'[IsPast] = TRUE )
