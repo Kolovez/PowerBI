@@ -1,0 +1,5 @@
+IsPast = 
+VAR LastSaleDate = MAX ( Sales[Order Date] )
+VAR LastSaleDatePY = EDATE ( LastSaleDate, -12 ) 
+RETURN
+'Date'[Date] <= LastSaleDatePY
