@@ -1,0 +1,9 @@
+let
+    Source = Excel.Workbook(Web.Contents("https://bavariannordic1.sharepoint.com/sites/-Asmalltest/Shared%20Documents/30%20Planning/SnOP/Stock%20prediction/Daily%20Copy%20Stock%20Prediction%20File%20-%20Do%20Not%20Delete/Stock%20Prediction_All%20Countries.xlsx"), null, true),
+    Deliveries_Table = Source{[Item="Deliveries",Kind="Table"]}[Data],
+    #"Changed Type" = Table.TransformColumnTypes(Deliveries_Table,{{"Source.Name", type text}, {"Doc Num", Int64.Type}, {"Picking Date", type date}, {"Reference", type text}, {"Customer PO", type text}, {"Card Code", type text}, {"Card Name", type text}, {"Street S", type text}, {"Zip Code S", Int64.Type}, {"City S", type text}, {"Country S", type text}, {"Item Code", type text}, {"Customer Item Code", Int64.Type}, {"Item Name", type text}, {"Doses", Int64.Type}, {"Qty in Packs", Int64.Type}, {"Qty in Doses", Int64.Type}, {"Batch", type text}, {"Expiry Date", type date}, {"Pallet ID", type any}, {"Zone Type Code", type text}, {"Quality Status Code", type text}, {"Amount Shipped", Int64.Type}, {"Type Shipped", type text}, {"Order Date", type date}, {"Order Time", Int64.Type}, {"Week Number", Int64.Type}, {"Month", Int64.Type}, {"Year", Int64.Type}, {"Country", type text}, {"Item", type text}, {"AD/PED", type text}, {"Pack size", Int64.Type}, {"Final Item Name", type text}, {"Final Country", type text}, {"Transaction Type", type text}}),
+    #"Removed Other Columns" = Table.SelectColumns(#"Changed Type",{"Picking Date", "Reference", "Customer PO", "City S", "Country S", "Item Name", "Qty in Doses", "Batch", "Expiry Date", "Item", "AD/PED", "Final Country"})
+in
+    #"Removed Other Columns"
+
+// This is a query that shows when the data was last refreshed.
