@@ -1,4 +1,4 @@
-// This measure will return sales up until the last date that you specify
+// This column will return sales up until the last date that you specify
 IsPast = 
 VAR LastSaleDate = MAX ( Sales[Order Date] ) -- This could be changed to Today()
 VAR LastSaleDatePY = EDATE ( LastSaleDate, -12 ) 
