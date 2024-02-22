@@ -1,6 +1,7 @@
-// This column will return sales up until the last date that you specify
+// This column will return value up until the last date that you specify
+
 IsPast = 
-VAR LastSaleDate = MAX ( Sales[Order Date] ) -- This could be changed to Today()
+VAR LastSaleDate = MAX ( Sales[Order Date] ) -- This can be changed to the max date you want to evaluate
 VAR LastSaleDatePY = EDATE ( LastSaleDate, -12 ) 
 RETURN
 'Date'[Date] <= LastSaleDatePY
