@@ -1,0 +1,121 @@
+
+Actual: SELECTEDMEASURE ()
+
+Currrent Year Full: CALCULATE(
+    SELECTEDMEASURE(),
+    PARALLELPERIOD(
+        Calendar[Date],
+        0,
+        YEAR
+    )
+)
+
+Last Year :
+CALCULATE(
+    SELECTEDMEASURE(),
+    DATEADD(
+        Calendar[Date],
+        -1,
+        YEAR
+    )
+)
+
+Last Year to Date:
+CALCULATE(
+    SELECTEDMEASURE(),
+    SAMEPERIODLASTYEAR(Calendar[Date]),
+    'Time Intelligence'[Name] = "Year to Date"
+)
+
+Last Year to Date %:
+VAR CurrentMeasure =
+    CALCULATE( SELECTEDMEASURE(), DATESYTD( Calendar[Date] ) )
+VAR PriorMeasure =
+    CALCULATE(
+        SELECTEDMEASURE(),
+        'Time Intelligence'[Name] = "Last Year to Date"
+    )
+VAR YearOverYearMeasure =
+    IF(
+        CurrentMeasure = BLANK()
+            || PriorMeasure = BLANK(),
+        BLANK(),
+        CurrentMeasure - PriorMeasure
+    )
+RETURN
+    DIVIDE( YearOverYearMeasure, PriorMeasure )
+
+
+Month to Date:
+CALCULATE( SELECTEDMEASURE( ), DATESMTD( Calendar[Date] ) )
+
+Previous Month:
+CALCULATE(
+    SELECTEDMEASURE(),
+    DATEADD(
+        Calendar[Date],
+        -1,
+        MONTH
+    )
+)
+
+Previous Year:
+CALCULATE(
+    SELECTEDMEASURE(),
+    DATEADD(
+        Calendar[Date],
+        -1,
+        YEAR
+    )
+)
+
+Previous Year Full:
+CALCULATE(
+    SELECTEDMEASURE(),
+    PARALLELPERIOD(
+       Calendar[Date],
+        -1,
+        YEAR
+    )
+)
+
+Quarter to Date:
+
+CALCULATE(
+    SELECTEDMEASURE(),
+    DATESQTD( Calendar[Date])
+)
+
+Rolling 12 months:
+CALCULATE(
+    CALCULATE(
+        SELECTEDMEASURE(),
+        DATESINPERIOD( Calendar[Date], MAX( Calendar[Date] ), -1, YEAR )
+    ),
+    DATEADD( Calendar[Date], -1, MONTH )
+)
+
+Year over Year :
+VAR CurrentMeasure =
+    SELECTEDMEASURE()
+VAR PriorMeasure =
+    CALCULATE( SELECTEDMEASURE(), DATEADD( Calendar[Date], -1, YEAR ) )
+RETURN
+    IF(
+        CurrentMeasure = BLANK()
+            || PriorMeasure = BLANK(),
+        BLANK(),
+        CurrentMeasure - PriorMeasure
+    )
+Year over Year %:
+DIVIDE(
+    CALCULATE( SELECTEDMEASURE( ), 'Time Intelligence'[Name] = "Year over Year" ),
+    CALCULATE( SELECTEDMEASURE( ), DATEADD( Calendar[Date], -1, YEAR ) )
+)
+
+Year to Date :
+
+CALCULATE(
+    SELECTEDMEASURE(),
+    DATESYTD( Calendar[Date] )
+)
