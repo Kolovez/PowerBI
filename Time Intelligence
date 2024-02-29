@@ -1,35 +1,35 @@
 
-Actual: SELECTEDMEASURE ()
+Actual= SELECTEDMEASURE ()
 
-Currrent Year Full: CALCULATE(
+Currrent Year Full= CALCULATE(
     SELECTEDMEASURE(),
     PARALLELPERIOD(
-        Calendar[Date],
+        _DimDate[Date],
         0,
         YEAR
     )
 )
 
-Last Year :
+Last Year =
 CALCULATE(
     SELECTEDMEASURE(),
     DATEADD(
-        Calendar[Date],
+        _DimDate[Date],
         -1,
         YEAR
     )
 )
 
-Last Year to Date:
+Last Year to Date=
 CALCULATE(
     SELECTEDMEASURE(),
-    SAMEPERIODLASTYEAR(Calendar[Date]),
+    SAMEPERIODLASTYEAR(_DimDate[Date]),
     'Time Intelligence'[Name] = "Year to Date"
 )
 
-Last Year to Date %:
+Last Year to Date %=
 VAR CurrentMeasure =
-    CALCULATE( SELECTEDMEASURE(), DATESYTD( Calendar[Date] ) )
+    CALCULATE( SELECTEDMEASURE(), DATESYTD( _DimDate[Date] ) )
 VAR PriorMeasure =
     CALCULATE(
         SELECTEDMEASURE(),
@@ -46,60 +46,60 @@ RETURN
     DIVIDE( YearOverYearMeasure, PriorMeasure )
 
 
-Month to Date:
-CALCULATE( SELECTEDMEASURE( ), DATESMTD( Calendar[Date] ) )
+Month to Date=
+CALCULATE( SELECTEDMEASURE( ), DATESMTD( _DimDate[Date] ) )
 
-Previous Month:
+Previous Month=
 CALCULATE(
     SELECTEDMEASURE(),
     DATEADD(
-        Calendar[Date],
+        _DimDate[Date],
         -1,
         MONTH
     )
 )
 
-Previous Year:
+Previous Year=
 CALCULATE(
     SELECTEDMEASURE(),
     DATEADD(
-        Calendar[Date],
+        _DimDate[Date],
         -1,
         YEAR
     )
 )
 
-Previous Year Full:
+Previous Year Full=
 CALCULATE(
     SELECTEDMEASURE(),
     PARALLELPERIOD(
-       Calendar[Date],
+       _DimDate[Date],
         -1,
         YEAR
     )
 )
 
-Quarter to Date:
+Quarter to Date=
 
 CALCULATE(
     SELECTEDMEASURE(),
-    DATESQTD( Calendar[Date])
+    DATESQTD( _DimDate[Date])
 )
 
-Rolling 12 months:
+Rolling 12 months=
 CALCULATE(
     CALCULATE(
         SELECTEDMEASURE(),
-        DATESINPERIOD( Calendar[Date], MAX( Calendar[Date] ), -1, YEAR )
+        DATESINPERIOD( _DimDate[Date], MAX( _DimDate[Date] ), -1, YEAR )
     ),
-    DATEADD( Calendar[Date], -1, MONTH )
+    DATEADD( _DimDate[Date], -1, MONTH )
 )
 
-Year over Year :
+Year over Year =
 VAR CurrentMeasure =
     SELECTEDMEASURE()
 VAR PriorMeasure =
-    CALCULATE( SELECTEDMEASURE(), DATEADD( Calendar[Date], -1, YEAR ) )
+    CALCULATE( SELECTEDMEASURE(), DATEADD( _DimDate[Date], -1, YEAR ) )
 RETURN
     IF(
         CurrentMeasure = BLANK()
@@ -107,15 +107,15 @@ RETURN
         BLANK(),
         CurrentMeasure - PriorMeasure
     )
-Year over Year %:
+Year over Year %=
 DIVIDE(
     CALCULATE( SELECTEDMEASURE( ), 'Time Intelligence'[Name] = "Year over Year" ),
-    CALCULATE( SELECTEDMEASURE( ), DATEADD( Calendar[Date], -1, YEAR ) )
+    CALCULATE( SELECTEDMEASURE( ), DATEADD( _DimDate[Date], -1, YEAR ) )
 )
 
-Year to Date :
+Year to Date =
 
 CALCULATE(
     SELECTEDMEASURE(),
-    DATESYTD( Calendar[Date] )
+    DATESYTD( _DimDate[Date] )
 )
