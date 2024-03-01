@@ -1,8 +1,13 @@
 _dimDate = 
-VAR _MinYear = YEAR(TODAY())-4
-VAR _MaxYear = YEAR(TODAY())+1
-VAR _Dates = CALENDAR(DATE(_MinYear,1,1),DATE(_MaxYear,12,31))
-VAR _StartWeek1 = DATE(2019,01,01)
+VAR _Today = TODAY()
+VAR _MinYear = YEAR(_Today) - 4
+VAR _MaxYear = YEAR(_Today) + 1
+VAR _Dates = CALENDAR(DATE(_MinYear, 1, 1), DATE(_MaxYear, 12, 31))
+VAR _CurrentISOWeek = WEEKNUM(_Today, 21)
+VAR _CurrentISOYear = YEAR(_Today) - (MONTH(_Today) = 1 && _CurrentISOWeek > 51)
+VAR _StartOfISOYear = DATE(_CurrentISOYear, 1, 1) + (4 - WEEKDAY(DATE(_CurrentISOYear, 1, 1), 2))
+VAR _StartOfISOYearAdjusted = IF(WEEKDAY(_StartOfISOYear, 2) > 4, _StartOfISOYear + 7, _StartOfISOYear)
+VAR _StartWeek1 = IF(WEEKDAY(DATE(2019, 1, 1), 2) <= 4, DATE(2019, 1, 1) - WEEKDAY(DATE(2019, 1, 1), 2) + 1, DATE(2019, 1, 1) - WEEKDAY(DATE(2019, 1, 1), 2) + 8)
 RETURN
 ADDCOLUMNS(
     _Dates,
@@ -11,26 +16,18 @@ ADDCOLUMNS(
     "Quarter", FORMAT([Date], "\QQ"),
     "MonthNo", MONTH([Date]),
     "Month", FORMAT([Date], "MMM"),
-    "Year-Month",YEAR([Date])&"-"&MONTH([Date]),
-    "Year-MonthName",YEAR([Date])&"-"&FORMAT([Date], "MMM"),
+    "Year-Month", YEAR([Date]) & "-" & MONTH([Date]),
+    "Year-MonthName", YEAR([Date]) & "-" & FORMAT([Date], "MMM"),
     "Year-Quarter", YEAR([Date]) & "-" & FORMAT(QUARTER([Date]), "00"),
     "WeekdayNo", WEEKDAY([Date]),
     "Weekday", FORMAT([Date], "DDD"),
-    "Week", WEEKNUM([Date],1),
+    "Week", WEEKNUM([Date], 1),
     "WeekID", WEEKNUM([Date], 1) + (YEAR([Date]) - _MinYear) * 53,
-    "WeekID_ISO", (INT([Date]- WEEKDAY([Date],3)-_StartWeek1)+7)/7,
-    "Week_ISO", WEEKNUM([Date],21),
-    "Year_ISO", 
-        IF(
-            WEEKNUM([Date], 21) < 5 && WEEKNUM([Date]) > 50,
-            YEAR([Date])+1,
-            IF(
-                WEEKNUM([Date], 21) > 50 && WEEKNUM([Date]) < 5,
-                YEAR([Date])-1,
-                YEAR([Date])
-            )
-        ),
-"RelativeDate", DATEDIFF(TODAY(), [Date], DAY),
-"RelativeMonth", DATEDIFF(TODAY(), [Date], MONTH),
-"RelativeYear", DATEDIFF(TODAY(), [Date], YEAR)
+    "WeekISO", WEEKNUM([Date], 21),
+    "WeekISOAdjusted", (INT([Date] - _StartWeek1 + 7) / 7) + 1,
+    "YearISO", YEAR(_StartOfISOYearAdjusted - 1 + INT([Date] - _StartOfISOYearAdjusted + (WEEKDAY(_StartOfISOYearAdjusted, 2) + 6)) / 7 * 7),
+    "RelativeWeek_ISO", (_CurrentISOWeek - WEEKNUM([Date], 21)) + (YEAR(_Today) - YEAR([Date])) * IF(MONTH(_Today) = 1 && _CurrentISOWeek > 51, 0, IF(MONTH([Date]) = 12 && WEEKNUM([Date], 21) > 51, 0, 52)),
+    "RelativeDate", DATEDIFF(_Today, [Date], DAY),
+    "RelativeMonth", DATEDIFF(_Today, [Date], MONTH),
+    "RelativeYear", DATEDIFF(_Today, [Date], YEAR)
 )
