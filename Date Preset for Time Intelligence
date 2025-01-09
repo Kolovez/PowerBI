@@ -30,3 +30,32 @@ let
     ReorderedColumns = Table.ReorderColumns(RemovedNotUsedColumns,{"key_date", "label", "label_sort_order"})
 in
     ReorderedColumns
+
+ \\ changed for Bavarian Nordic _dimDate table
+
+let
+    Source = date_presets_list,
+    AddDatesInRange = Table.AddColumn(Source, "key_date", each 
+        let OffsetFrom = [offset_from],
+            OffsetTo = [offset_to],
+            OffsetType = [unit],
+            LastNDays = Table.SelectRows(_DimDate, each [MovingDay] >= OffsetFrom and [MovingDay] <= OffsetTo)[key_date],
+            LastNMonths = Table.SelectRows(_DimDate, each [MovingMonth] >= OffsetFrom and [MovingMonth] <= OffsetTo)[key_date],
+            LastNYears = Table.SelectRows(_DimDate, each [MovingYear] >= OffsetFrom and [MovingYear] <= OffsetTo)[key_date],
+            ThisMonth = Table.SelectRows(_DimDate, each [MovingMonth] >= OffsetFrom and [MovingMonth] <= OffsetTo and [MovingDay] <= 0)[key_date],
+            ThisYear = Table.SelectRows(_DimDate, each [MovingYear] >= OffsetFrom and [MovingYear] <= OffsetTo and [MovingDay] <= 0)[key_date]
+        in 
+            if OffsetType = "Day" then LastNDays 
+                else if OffsetType = "Month" then LastNMonths 
+                else if OffsetType = "Year" then LastNYears 
+                else if OffsetType = "MTD" then ThisMonth
+                else if OffsetType = "YTD" then ThisYear
+                else null
+    ),
+    #"Changed Type1" = Table.TransformColumnTypes(AddDatesInRange,{{"offset_from", Int64.Type}, {"offset_to", Int64.Type}}),
+    ExpandDatesInRange = Table.ExpandListColumn(#"Changed Type1", "key_date"),
+    RemovedNotUsedColumns = Table.RemoveColumns(ExpandDatesInRange,{"offset_to", "offset_from", "unit"}),
+    ReorderedColumns = Table.ReorderColumns(RemovedNotUsedColumns,{"key_date", "label", "label_sort_order"})
+in
+    ReorderedColumns
+
