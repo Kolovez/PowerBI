@@ -1,0 +1,32 @@
+// Preset table
+let
+    Source = make_date_presets
+in
+    Source
+
+// Make date preset table
+let
+    Source = date_presets_list,
+    AddDatesInRange = Table.AddColumn(Source, "key_date", each 
+        let OffsetFrom = [offset_from],
+            OffsetTo = [offset_to],
+            OffsetType = [unit],
+            LastNDays = Table.SelectRows( date, each [Date Offset] >= OffsetFrom and [Date Offset] <= OffsetTo )[key_date],
+            LastNMonths = Table.SelectRows( date, each [Month Offset] >= OffsetFrom and [Month Offset] <= OffsetTo )[key_date],
+            LastNYears = Table.SelectRows( date, each [Year Offset] >= OffsetFrom and [Year Offset] <= OffsetTo )[key_date],
+            ThisMonth = Table.SelectRows( date, each [Month Offset] >= OffsetFrom and [Month Offset] <= OffsetTo and [Date Offset] <= 0 )[key_date],
+            ThisYear = Table.SelectRows( date, each [Year Offset] >= OffsetFrom and [Year Offset] <= OffsetTo and [Date Offset] <= 0 )[key_date]
+        in 
+            if OffsetType = "Day" then LastNDays 
+                else if OffsetType = "Month" then LastNMonths 
+                else if OffsetType = "Year" then LastNYears 
+                else if OffsetType = "MTD" then ThisMonth
+                else if OffsetType = "YTD" then ThisYear
+                else null
+    ),
+    ExpandDatesInRange = Table.ExpandListColumn(AddDatesInRange, "key_date"),
+    #"Changed Type" = Table.TransformColumnTypes(ExpandDatesInRange,{{"key_date", Int64.Type}}),
+    RemovedNotUsedColumns = Table.RemoveColumns(#"Changed Type",{"offset_to", "offset_from", "unit"}),
+    ReorderedColumns = Table.ReorderColumns(RemovedNotUsedColumns,{"key_date", "label", "label_sort_order"})
+in
+    ReorderedColumns
